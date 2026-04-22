@@ -1,0 +1,35 @@
+{% extends "base/base.html" %}
+{% block title %}Visitor Registration{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-9">
+        <div class="mb-4">
+            <div class="page-kicker">Welcome</div>
+            <h1 class="page-title h2">Visitor Registration</h1>
+            <p class="text-muted mb-0">Complete your visit details before arriving at reception.</p>
+        </div>
+        <form method="post" class="card">
+            {% csrf_token %}
+            <div class="card-body">
+                {{ form.non_field_errors }}
+                <h2 class="h5 fw-bold text-primary">Visitor details</h2>
+                <div class="row g-3">
+                    {% for field in form %}
+                        {% if forloop.counter == 8 %}
+                            </div><hr><h2 class="h5 fw-bold text-success">Host and schedule</h2><div class="row g-3">
+                        {% endif %}
+                        <div class="col-md-6">
+                            <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} *{% endif %}</label>
+                            {{ field }}
+                            {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="card-footer bg-white text-end">
+                <button type="submit" class="btn btn-primary px-4">Submit registration</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

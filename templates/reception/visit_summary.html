@@ -1,0 +1,11 @@
+<div class="card">
+    <div class="card-body">
+        <h2 class="h5">{{ visit.visitor_name }}</h2>
+        <p class="mb-1"><strong>Reference:</strong> {{ visit.reference_no }}</p>
+        <p class="mb-1"><strong>Phone:</strong> {{ visit.visitor_phone }}</p>
+        <p class="mb-1"><strong>Host:</strong> {{ visit.host_name }}</p>
+        <p class="mb-1"><strong>Date/time:</strong> {{ visit.visit_date }} {{ visit.visit_time }}</p>
+        <p class="mb-3"><strong>Status:</strong> {% include "reception/_status_badge.html" %}</p>
+        <a class="btn btn-outline-primary" href="{% url 'reception:visit-detail' visit.pk %}">Open full details</a>
+    </div>
+</div>

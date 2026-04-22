@@ -1,0 +1,63 @@
+{% extends "base/base.html" %}
+{% block title %}Visit Detail{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <div class="page-kicker">Visit details</div>
+        <h1 class="page-title h2 mb-1">{{ visit.visitor_name }}</h1>
+        <div class="text-muted">{{ visit.reference_no }} - {% include "reception/_status_badge.html" %}</div>
+    </div>
+    <div class="d-flex gap-2">
+        {% if visit.can_check_in %}
+            <form method="post" action="{% url 'reception:check-in' visit.pk %}">
+                {% csrf_token %}
+                <button class="btn btn-success" type="submit">Check-in</button>
+            </form>
+        {% endif %}
+        {% if visit.can_check_out %}
+            <form method="post" action="{% url 'reception:check-out' visit.pk %}">
+                {% csrf_token %}
+                <button class="btn btn-warning" type="submit">Checkout</button>
+            </form>
+        {% endif %}
+    </div>
+</div>
+<div class="row g-3">
+    <div class="col-lg-8">
+        <div class="card mb-3">
+            <div class="card-header bg-white fw-semibold text-primary">Visitor details</div>
+            <div class="card-body row g-3">
+                <div class="col-md-6"><strong>Phone</strong><div>{{ visit.visitor_phone }}</div></div>
+                <div class="col-md-6"><strong>Email</strong><div>{{ visit.visitor_email|default:"-" }}</div></div>
+                <div class="col-md-6"><strong>Company</strong><div>{{ visit.visitor_company|default:"-" }}</div></div>
+                <div class="col-md-6"><strong>ID</strong><div>{{ visit.visitor_id_type|default:"-" }} {{ visit.visitor_id_no }}</div></div>
+                <div class="col-12"><strong>Purpose</strong><div>{{ visit.purpose_of_visit }}</div></div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header bg-white fw-semibold text-success">Host and visit</div>
+            <div class="card-body row g-3">
+                <div class="col-md-6"><strong>Host</strong><div>{{ visit.host_name }}</div></div>
+                <div class="col-md-6"><strong>Department</strong><div>{{ visit.host_department|default:"-" }}</div></div>
+                <div class="col-md-6"><strong>Host phone</strong><div>{{ visit.host_phone|default:"-" }}</div></div>
+                <div class="col-md-6"><strong>Host email</strong><div>{{ visit.host_email|default:"-" }}</div></div>
+                <div class="col-md-6"><strong>Visit date</strong><div>{{ visit.visit_date }}</div></div>
+                <div class="col-md-6"><strong>Visit time</strong><div>{{ visit.visit_time }}</div></div>
+                <div class="col-md-6"><strong>Checked in</strong><div>{{ visit.checked_in_at|default:"-" }}</div></div>
+                <div class="col-md-6"><strong>Checked out</strong><div>{{ visit.checked_out_at|default:"-" }}</div></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card text-center">
+            <div class="card-header bg-white fw-semibold text-primary">QR Code</div>
+            <div class="card-body">
+                {% if visit.qr_code_image %}
+                    <img class="img-fluid qr-frame p-3" src="{{ visit.qr_code_image.url }}" alt="Visit QR code">
+                {% endif %}
+                <div class="small text-break mt-2">{{ visit.qr_token }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

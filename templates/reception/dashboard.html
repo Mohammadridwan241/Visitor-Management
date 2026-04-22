@@ -1,0 +1,39 @@
+{% extends "base/base.html" %}
+{% block title %}Reception Dashboard{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <div class="page-kicker">Today overview</div>
+        <h1 class="page-title h2 mb-0">Reception Dashboard</h1>
+    </div>
+    <a class="btn btn-primary" href="{% url 'reception:scan' %}">Scan QR</a>
+</div>
+<div class="row g-3 mb-4">
+    <div class="col-md-3"><div class="card stat-card stat-blue"><div class="card-body"><div class="text-muted">Today</div><div class="display-6 fw-bold">{{ total_today }}</div></div></div></div>
+    <div class="col-md-3"><div class="card stat-card stat-amber"><div class="card-body"><div class="text-muted">Pending</div><div class="display-6 fw-bold">{{ pending }}</div></div></div></div>
+    <div class="col-md-3"><div class="card stat-card stat-teal"><div class="card-body"><div class="text-muted">Checked-in</div><div class="display-6 fw-bold">{{ checked_in }}</div></div></div></div>
+    <div class="col-md-3"><div class="card stat-card stat-slate"><div class="card-body"><div class="text-muted">Checked-out</div><div class="display-6 fw-bold">{{ checked_out }}</div></div></div></div>
+</div>
+<div class="card">
+    <div class="card-header bg-white fw-semibold text-primary">Recent visit requests</div>
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead><tr><th>Reference</th><th>Visitor</th><th>Host</th><th>Date</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+            {% for visit in recent_visits %}
+                <tr>
+                    <td>{{ visit.reference_no }}</td>
+                    <td>{{ visit.visitor_name }}</td>
+                    <td>{{ visit.host_name }}</td>
+                    <td>{{ visit.visit_date }}</td>
+                    <td>{% include "reception/_status_badge.html" %}</td>
+                    <td><a class="btn btn-sm btn-outline-primary" href="{% url 'reception:visit-detail' visit.pk %}">Open</a></td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="6" class="text-center text-muted py-4">No visit requests yet.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

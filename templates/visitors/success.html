@@ -1,0 +1,23 @@
+{% extends "base/base.html" %}
+{% block title %}Registration Submitted{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card">
+            <div class="card-body text-center p-4">
+                <div class="page-kicker justify-content-center">Ready for reception</div>
+                <h1 class="page-title h2">Registration submitted</h1>
+                <p class="text-muted">Show this QR code to the receptionist when you arrive.</p>
+                <div class="fs-5 mb-3">Reference: <strong>{{ visit.reference_no }}</strong></div>
+                {% if visit.qr_code_image %}
+                    <img class="img-fluid qr-frame p-3 mb-3" src="{{ visit.qr_code_image.url }}" alt="Visit QR code" style="max-width: 320px;">
+                {% endif %}
+                <div>
+                    <span class="badge text-bg-warning status-pill">{{ visit.get_status_display }}</span>
+                </div>
+                <a class="btn btn-outline-primary mt-3" href="{{ visit.qr_code_image.url }}" download>Download QR code</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

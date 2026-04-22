@@ -1,0 +1,791 @@
+openapi: 3.0.3
+info:
+  title: Visitor Management System API
+  version: 1.0.0
+  description: Receptionist workflow APIs for visitor registration, QR lookup, check-in,
+    and checkout.
+paths:
+  /api/auth/login/:
+    post:
+      operationId: api_auth_login_create
+      description: |-
+        Takes a set of user credentials and returns an access and refresh JSON web
+        token pair to prove the authentication of those credentials.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPair'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPair'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPair'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenObtainPair'
+          description: ''
+  /api/auth/logout/:
+    post:
+      operationId: api_auth_logout_create
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/auth/refresh/:
+    post:
+      operationId: api_auth_refresh_create
+      description: |-
+        Takes a refresh type JSON web token and returns an access type JSON web
+        token if the refresh token is valid.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenRefresh'
+          description: ''
+  /api/dashboard/summary/:
+    get:
+      operationId: api_dashboard_summary_retrieve
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardSummary'
+          description: ''
+  /api/schema/:
+    get:
+      operationId: api_schema_retrieve
+      description: |-
+        OpenApi3 schema for this API. Format can be selected via content negotiation.
+
+        - YAML: application/vnd.oai.openapi
+        - JSON: application/vnd.oai.openapi+json
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - yaml
+      - in: query
+        name: lang
+        schema:
+          type: string
+          enum:
+          - af
+          - ar
+          - ar-dz
+          - ast
+          - az
+          - be
+          - bg
+          - bn
+          - br
+          - bs
+          - ca
+          - ckb
+          - cs
+          - cy
+          - da
+          - de
+          - dsb
+          - el
+          - en
+          - en-au
+          - en-gb
+          - eo
+          - es
+          - es-ar
+          - es-co
+          - es-mx
+          - es-ni
+          - es-ve
+          - et
+          - eu
+          - fa
+          - fi
+          - fr
+          - fy
+          - ga
+          - gd
+          - gl
+          - he
+          - hi
+          - hr
+          - hsb
+          - hu
+          - hy
+          - ia
+          - id
+          - ig
+          - io
+          - is
+          - it
+          - ja
+          - ka
+          - kab
+          - kk
+          - km
+          - kn
+          - ko
+          - ky
+          - lb
+          - lt
+          - lv
+          - mk
+          - ml
+          - mn
+          - mr
+          - ms
+          - my
+          - nb
+          - ne
+          - nl
+          - nn
+          - os
+          - pa
+          - pl
+          - pt
+          - pt-br
+          - ro
+          - ru
+          - sk
+          - sl
+          - sq
+          - sr
+          - sr-latn
+          - sv
+          - sw
+          - ta
+          - te
+          - tg
+          - th
+          - tk
+          - tr
+          - tt
+          - udm
+          - ug
+          - uk
+          - ur
+          - uz
+          - vi
+          - zh-hans
+          - zh-hant
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.oai.openapi:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/yaml:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/vnd.oai.openapi+json:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/visits/:
+    get:
+      operationId: api_visits_list
+      parameters:
+      - in: query
+        name: date_from
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: date_to
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: host_name
+        schema:
+          type: string
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - in: query
+        name: phone
+        schema:
+          type: string
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: status
+        schema:
+          type: string
+          enum:
+          - CHECKED_IN
+          - CHECKED_OUT
+          - PENDING
+        description: |-
+          * `PENDING` - Pending
+          * `CHECKED_IN` - Checked-in
+          * `CHECKED_OUT` - Checked-out
+      - in: query
+        name: visit_date
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: visitor_name
+        schema:
+          type: string
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedVisitListList'
+          description: ''
+  /api/visits/{id}/:
+    get:
+      operationId: api_visits_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VisitDetail'
+          description: ''
+  /api/visits/{id}/check-in/:
+    post:
+      operationId: api_visits_check_in_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VisitCheckIn'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VisitCheckIn'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VisitCheckIn'
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VisitCheckIn'
+          description: ''
+  /api/visits/{id}/check-out/:
+    post:
+      operationId: api_visits_check_out_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VisitCheckOut'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VisitCheckOut'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VisitCheckOut'
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VisitCheckOut'
+          description: ''
+  /api/visits/qr/{token}/:
+    get:
+      operationId: api_visits_qr_retrieve
+      parameters:
+      - in: path
+        name: token
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VisitDetail'
+          description: ''
+  /api/visits/reference/{reference_no}/:
+    get:
+      operationId: api_visits_reference_retrieve
+      parameters:
+      - in: path
+        name: reference_no
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VisitDetail'
+          description: ''
+  /api/visits/register/:
+    post:
+      operationId: api_visits_register_create
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VisitRegistration'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VisitRegistration'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VisitRegistration'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VisitRegistration'
+          description: ''
+components:
+  schemas:
+    DashboardSummary:
+      type: object
+      properties:
+        total_today:
+          type: integer
+        pending:
+          type: integer
+        checked_in:
+          type: integer
+        checked_out:
+          type: integer
+      required:
+      - checked_in
+      - checked_out
+      - pending
+      - total_today
+    PaginatedVisitListList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/VisitList'
+    StatusEnum:
+      enum:
+      - PENDING
+      - CHECKED_IN
+      - CHECKED_OUT
+      type: string
+      description: |-
+        * `PENDING` - Pending
+        * `CHECKED_IN` - Checked-in
+        * `CHECKED_OUT` - Checked-out
+    TokenObtainPair:
+      type: object
+      properties:
+        username:
+          type: string
+          writeOnly: true
+        password:
+          type: string
+          writeOnly: true
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+          readOnly: true
+      required:
+      - access
+      - password
+      - refresh
+      - username
+    TokenRefresh:
+      type: object
+      properties:
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+          writeOnly: true
+      required:
+      - access
+      - refresh
+    VisitCheckIn:
+      type: object
+      properties:
+        note:
+          type: string
+    VisitCheckOut:
+      type: object
+      properties:
+        note:
+          type: string
+    VisitDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        can_check_in:
+          type: boolean
+          readOnly: true
+        can_check_out:
+          type: boolean
+          readOnly: true
+        qr_image_url:
+          type: string
+          nullable: true
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        reference_no:
+          type: string
+          maxLength: 30
+        visitor_name:
+          type: string
+          maxLength: 120
+        visitor_phone:
+          type: string
+          maxLength: 30
+        visitor_email:
+          type: string
+          format: email
+          maxLength: 254
+        visitor_company:
+          type: string
+          maxLength: 120
+        visitor_id_type:
+          type: string
+          maxLength: 50
+        visitor_id_no:
+          type: string
+          maxLength: 80
+        purpose_of_visit:
+          type: string
+          maxLength: 255
+        host_name:
+          type: string
+          maxLength: 120
+        host_department:
+          type: string
+          maxLength: 120
+        host_phone:
+          type: string
+          maxLength: 30
+        host_email:
+          type: string
+          format: email
+          maxLength: 254
+        visit_date:
+          type: string
+          format: date
+        visit_time:
+          type: string
+          format: time
+        qr_token:
+          type: string
+          maxLength: 96
+        qr_code_image:
+          type: string
+          format: uri
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        submitted_at:
+          type: string
+          format: date-time
+        checked_in_at:
+          type: string
+          format: date-time
+          nullable: true
+        checked_out_at:
+          type: string
+          format: date-time
+          nullable: true
+        checked_in_by:
+          type: integer
+          nullable: true
+        checked_out_by:
+          type: integer
+          nullable: true
+      required:
+      - can_check_in
+      - can_check_out
+      - created_at
+      - host_name
+      - id
+      - purpose_of_visit
+      - qr_image_url
+      - qr_token
+      - reference_no
+      - updated_at
+      - visit_date
+      - visit_time
+      - visitor_name
+      - visitor_phone
+    VisitList:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        reference_no:
+          type: string
+          maxLength: 30
+        visitor_name:
+          type: string
+          maxLength: 120
+        visitor_phone:
+          type: string
+          maxLength: 30
+        host_name:
+          type: string
+          maxLength: 120
+        visit_date:
+          type: string
+          format: date
+        visit_time:
+          type: string
+          format: time
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        checked_in_at:
+          type: string
+          format: date-time
+          nullable: true
+        checked_out_at:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+      - host_name
+      - id
+      - reference_no
+      - visit_date
+      - visit_time
+      - visitor_name
+      - visitor_phone
+    VisitRegistration:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        reference_no:
+          type: string
+          readOnly: true
+        visitor_name:
+          type: string
+          maxLength: 120
+        visitor_phone:
+          type: string
+          maxLength: 30
+        visitor_email:
+          type: string
+          format: email
+          maxLength: 254
+        visitor_company:
+          type: string
+          maxLength: 120
+        visitor_id_type:
+          type: string
+          maxLength: 50
+        visitor_id_no:
+          type: string
+          maxLength: 80
+        purpose_of_visit:
+          type: string
+          maxLength: 255
+        host_name:
+          type: string
+          maxLength: 120
+        host_department:
+          type: string
+          maxLength: 120
+        host_phone:
+          type: string
+          maxLength: 30
+        host_email:
+          type: string
+          format: email
+          maxLength: 254
+        visit_date:
+          type: string
+          format: date
+        visit_time:
+          type: string
+          format: time
+        qr_token:
+          type: string
+          readOnly: true
+        qr_image_url:
+          type: string
+          nullable: true
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/StatusEnum'
+          readOnly: true
+        submitted_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - host_name
+      - id
+      - purpose_of_visit
+      - qr_image_url
+      - qr_token
+      - reference_no
+      - status
+      - submitted_at
+      - visit_date
+      - visit_time
+      - visitor_name
+      - visitor_phone
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

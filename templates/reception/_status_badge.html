@@ -1,0 +1,7 @@
+{% if visit.status == "PENDING" %}
+    <span class="badge text-bg-warning status-pill">Pending</span>
+{% elif visit.status == "CHECKED_IN" %}
+    <span class="badge text-bg-success status-pill">Checked-in</span>
+{% else %}
+    <span class="badge text-bg-secondary status-pill">Checked-out</span>
+{% endif %}

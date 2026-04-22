@@ -1,0 +1,40 @@
+{% extends "base/base.html" %}
+{% block title %}Visitor List{% endblock %}
+{% block content %}
+<div class="mb-3">
+    <div class="page-kicker">Search desk</div>
+    <h1 class="page-title h2 mb-0">Visitor List</h1>
+</div>
+<form method="get" class="card card-body mb-3">
+    <div class="row g-2 align-items-end">
+        <div class="col-md-2">{{ filter.form.status.label_tag }} {{ filter.form.status }}</div>
+        <div class="col-md-2">{{ filter.form.visit_date.label_tag }} {{ filter.form.visit_date }}</div>
+        <div class="col-md-2">{{ filter.form.visitor_name.label_tag }} {{ filter.form.visitor_name }}</div>
+        <div class="col-md-2">{{ filter.form.phone.label_tag }} {{ filter.form.phone }}</div>
+        <div class="col-md-2">{{ filter.form.host_name.label_tag }} {{ filter.form.host_name }}</div>
+        <div class="col-md-2"><button class="btn btn-primary w-100">Filter</button></div>
+    </div>
+</form>
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead><tr><th>Reference</th><th>Visitor</th><th>Phone</th><th>Host</th><th>Date</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+            {% for visit in visits %}
+                <tr>
+                    <td>{{ visit.reference_no }}</td>
+                    <td>{{ visit.visitor_name }}</td>
+                    <td>{{ visit.visitor_phone }}</td>
+                    <td>{{ visit.host_name }}</td>
+                    <td>{{ visit.visit_date }}</td>
+                    <td>{% include "reception/_status_badge.html" %}</td>
+                    <td><a class="btn btn-sm btn-outline-primary" href="{% url 'reception:visit-detail' visit.pk %}">Open</a></td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="7" class="text-center text-muted py-4">No visitors found.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
