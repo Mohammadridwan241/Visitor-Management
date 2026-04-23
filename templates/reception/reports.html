@@ -1,26 +1,53 @@
 {% extends "base/base.html" %}
 {% block title %}Reports{% endblock %}
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
+<div class="d-flex justify-content-between align-items-end mb-4">
     <div>
-        <div class="page-kicker">Export center</div>
-        <h1 class="page-title h2 mb-0">Reports</h1>
+        <div class="page-kicker">Visitor insights</div>
+        <h1 class="page-title h2 mb-1">Reports</h1>
+        <p class="text-muted mb-0">Review visitor traffic by status, host, visitor, and date range.</p>
     </div>
-    <a class="btn btn-outline-primary" href="{% url 'reception:export-csv' %}?{{ request.GET.urlencode }}">Export CSV</a>
 </div>
-<form method="get" class="card card-body mb-3">
-    <div class="row g-2 align-items-end">
-        <div class="col-md-2">{{ filter.form.status.label_tag }} {{ filter.form.status }}</div>
-        <div class="col-md-2">{{ filter.form.date_from.label_tag }} {{ filter.form.date_from }}</div>
-        <div class="col-md-2">{{ filter.form.date_to.label_tag }} {{ filter.form.date_to }}</div>
-        <div class="col-md-2">{{ filter.form.host_name.label_tag }} {{ filter.form.host_name }}</div>
-        <div class="col-md-2">{{ filter.form.visitor_name.label_tag }} {{ filter.form.visitor_name }}</div>
-        <div class="col-md-2"><button class="btn btn-primary w-100">Apply</button></div>
+<form method="get" class="card mb-4">
+    <div class="card-header bg-white fw-semibold text-primary">Filter report</div>
+    <div class="card-body">
+        <div class="row g-3 align-items-end">
+            <div class="col-lg-2 col-md-4">
+                <label class="form-label" for="{{ filter.form.status.id_for_label }}">Status</label>
+                {{ filter.form.status }}
+            </div>
+            <div class="col-lg-2 col-md-4">
+                <label class="form-label" for="{{ filter.form.date_from.id_for_label }}">From date</label>
+                {{ filter.form.date_from }}
+            </div>
+            <div class="col-lg-2 col-md-4">
+                <label class="form-label" for="{{ filter.form.date_to.id_for_label }}">To date</label>
+                {{ filter.form.date_to }}
+            </div>
+            <div class="col-lg-2 col-md-4">
+                <label class="form-label" for="{{ filter.form.host_name.id_for_label }}">Host</label>
+                {{ filter.form.host_name }}
+            </div>
+            <div class="col-lg-2 col-md-4">
+                <label class="form-label" for="{{ filter.form.visitor_name.id_for_label }}">Visitor</label>
+                {{ filter.form.visitor_name }}
+            </div>
+            <div class="col-lg-2 col-md-4">
+                <button class="btn btn-primary w-100 py-2">Apply filters</button>
+            </div>
+        </div>
     </div>
 </form>
 <div class="row g-3 mb-3">
     {% for item in summary %}
-        <div class="col-md-3"><div class="card stat-card stat-blue"><div class="card-body"><div class="text-muted">{{ item.status }}</div><div class="display-6 fw-bold">{{ item.total }}</div></div></div></div>
+        <div class="col-md-3">
+            <div class="card stat-card {% cycle 'stat-blue' 'stat-amber' 'stat-teal' 'stat-slate' %}">
+                <div class="card-body">
+                    <div class="text-muted">{{ item.status|title }}</div>
+                    <div class="display-6 fw-bold">{{ item.total }}</div>
+                </div>
+            </div>
+        </div>
     {% empty %}
         <div class="col-12"><div class="alert alert-info">No report data for the selected filters.</div></div>
     {% endfor %}
