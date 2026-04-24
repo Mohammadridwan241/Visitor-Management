@@ -125,6 +125,8 @@ GET /api/dashboard/summary/
 - Set `DJANGO_DEBUG=False`.
 - Use PostgreSQL with `DATABASE_URL=postgres://user:password@host:5432/dbname`.
 - Configure `DJANGO_ALLOWED_HOSTS` and `DJANGO_CSRF_TRUSTED_ORIGINS`.
+- On Render, set `SITE_URL` to your public app URL such as `https://visitor-management-mzrg.onrender.com`.
+- Render also exposes `RENDER_EXTERNAL_HOSTNAME`; the app now uses that automatically for `ALLOWED_HOSTS` and CSRF trusted origins.
 - Serve `MEDIA_ROOT` securely so QR images are available.
 - Put Django behind HTTPS and a production WSGI/ASGI server.
 

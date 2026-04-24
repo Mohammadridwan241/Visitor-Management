@@ -16,11 +16,37 @@ def env_list(name, default=''):
     return [item.strip() for item in os.getenv(name, default).split(',') if item.strip()]
 
 
+def hostname_from_url(url):
+    if not url:
+        return ''
+    parsed = urlparse(url)
+    return (parsed.hostname or '').strip()
+
+
+def merge_unique(items):
+    merged = []
+    for item in items:
+        value = (item or '').strip()
+        if value and value not in merged:
+            merged.append(value)
+    return merged
+
+
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-local-dev-change-me')
 DEBUG = env_bool('DJANGO_DEBUG', True)
-ALLOWED_HOSTS = env_list('DJANGO_ALLOWED_HOSTS', '127.0.0.1,localhost')
-CSRF_TRUSTED_ORIGINS = env_list('DJANGO_CSRF_TRUSTED_ORIGINS')
 SITE_URL = os.getenv('SITE_URL', 'http://127.0.0.1:8000').rstrip('/')
+RENDER_EXTERNAL_HOSTNAME = os.getenv('RENDER_EXTERNAL_HOSTNAME', '').strip()
+
+ALLOWED_HOSTS = merge_unique(
+    env_list('DJANGO_ALLOWED_HOSTS', '127.0.0.1,localhost')
+    + [hostname_from_url(SITE_URL), RENDER_EXTERNAL_HOSTNAME]
+)
+
+CSRF_TRUSTED_ORIGINS = merge_unique(
+    env_list('DJANGO_CSRF_TRUSTED_ORIGINS')
+    + ([SITE_URL] if SITE_URL else [])
+    + ([f'https://{RENDER_EXTERNAL_HOSTNAME}'] if RENDER_EXTERNAL_HOSTNAME else [])
+)
 
 INSTALLED_APPS = [
     'apps.accounts',
